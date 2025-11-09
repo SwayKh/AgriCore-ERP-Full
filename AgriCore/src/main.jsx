@@ -14,7 +14,7 @@ import {createTheme} from "@mui/material/styles"
 
 import ProtectedRoutes from "./Utils/ProtectedRoutes.jsx";
 import InventoryTable from './components/tables/InventoryTable.jsx';
-// Assuming these table components exist in the same directory
+
 import CropsTable from './components/tables/CropsTable.jsx';
 import LivestockTable from './components/tables/LivestockTable.jsx';
 import FinanceTable from './components/tables/FinanceTable.jsx';
@@ -24,7 +24,7 @@ const Dashboard = () => <div>Welcome to AgriCore Dashboard!</div>;
 
 const router=createBrowserRouter([
     {
-        path:'/login', // Use lowercase for consistency
+        path:'/login', 
         element:<Login2/>
     },
     {
@@ -56,7 +56,7 @@ const router=createBrowserRouter([
 ]);
 
 const theme=createTheme(
-    // Your theme configuration goes here
+   
 );
 
 createRoot(document.getElementById('root')).render(
