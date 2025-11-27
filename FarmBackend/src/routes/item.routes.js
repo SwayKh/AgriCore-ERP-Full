@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { addItem } from "../controllers/item.controller.js";
+import { addCategory, addItem } from "../controllers/item.controller.js";
 import { verifyJWT } from "../middlewares/verifyJWT.middleware.js";
 import { getItems } from "../controllers/item.controller.js";
 import { updateItem } from "../controllers/item.controller.js";
 import { deleteItem } from "../controllers/item.controller.js";
 
 const router = Router();
+
+router.route("/addCategory").post(verifyJWT, addCategory)
 
 router.route("/addItem").post(verifyJWT, addItem);
 
@@ -14,5 +16,7 @@ router.route("/getItems").get(verifyJWT, getItems);
 router.route("/updateItem/:id").patch(verifyJWT, updateItem);
 
 router.route("/delete/:id").delete(verifyJWT, deleteItem);
+
+s
 
 export{router};
