@@ -16,10 +16,10 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 const drawerWidth = 240;
 
 const menuItems = [
-    { text: 'CROPS', path: '/crops', icon: <GrassIcon /> },
-    { text: 'LIVESTOCK', path: '/livestock', icon: <AgricultureIcon /> },
-    { text: 'FINANCE', path: '/finance', icon: <AttachMoneyIcon /> },
-    { text: 'INVENTORY', path: '/inventory', icon: <InventoryIcon /> }
+    { text: 'CROPS', path: '/app/crops', icon: <GrassIcon /> },
+    { text: 'LIVESTOCK', path: '/app/livestock', icon: <AgricultureIcon /> },
+    { text: 'FINANCE', path: '/app/finance', icon: <AttachMoneyIcon /> },
+    { text: 'INVENTORY', path: '/app/inventory', icon: <InventoryIcon /> }
 ];
 
 export default function Sidebar() {

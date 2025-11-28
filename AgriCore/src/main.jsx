@@ -12,6 +12,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import {ThemeProvider} from "@mui/material/styles"
 import {createTheme} from "@mui/material/styles"
 import { green, amber } from "@mui/material/colors";
+import LandingPage from './components/LandingPage.jsx';
 
 import ProtectedRoutes from "./Utils/ProtectedRoutes.jsx";
 import InventoryTable from "./components/tables/Inventory/InventoryTable.jsx";
@@ -27,11 +28,19 @@ const Dashboard = () => <div>Welcome to AgriCore Dashboard!</div>;
 
 const router=createBrowserRouter([
     {
+        path:'/login', 
+        element:<Login2/>
+    },
+    {
         path:'/signup', 
         element:<Login2/>
     },
     {
         path:'/',
+        element: <LandingPage/>
+    },
+    {
+        path:'/app',
         element:<ProtectedRoutes><Layout/></ProtectedRoutes>, // Protect the entire layout
         children:[
             {
