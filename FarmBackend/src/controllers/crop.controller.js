@@ -102,7 +102,7 @@ const updateCrop = asyncHandler(async(req, res)=>{
     //update the crop status to harvested 
     //update the stock with yield produced
 
-    const{actualYield, price, category} = req.body;
+    const{actualYield,price, category} = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(req.params?.id)) {
         return res.status(400).json({
@@ -113,10 +113,6 @@ const updateCrop = asyncHandler(async(req, res)=>{
 
     const categoryId = new mongoose.Types.ObjectId(category);
     const cropId = new mongoose.Types.ObjectId(req.params?.id);
-
-    console.log(categoryId);
-    console.log(cropId);
-    
 
     if (!actualYield || !price || !category) {
         throw new ApiError(400, "All fields are required ", false);
@@ -132,7 +128,7 @@ const updateCrop = asyncHandler(async(req, res)=>{
         //updating the crop data with actual yield and status
         const cropData = await Crop.findByIdAndUpdate(cropId,
         {$set:{status:"Harvested",
-            actualYield:actualYield
+            actualYield:actualYield,
         }},
         {new:true},
         {session}
