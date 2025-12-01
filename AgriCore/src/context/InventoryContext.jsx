@@ -33,10 +33,10 @@ export const InventoryProvider = ({ children }) => {
     try {
       // Fetch inventory and categories in parallel.
       const [inventoryResponse, categoriesResponse] = await Promise.all([
-        fetch(import.meta.end.VITE_BACKEND_URL + "/api/v1/item/getItems", {
+        fetch(import.meta.env.VITE_BACKEND_URL + "/api/v1/item/getItems", {
           credentials: "include",
         }),
-        fetch(import.meta.end.VITE_BACKEND_URL + "/api/v1/item/getCategories", {
+        fetch(import.meta.env.VITE_BACKEND_URL + "/api/v1/item/getCategories", {
           credentials: "include",
         }),
       ]);
@@ -86,8 +86,8 @@ export const InventoryProvider = ({ children }) => {
     try {
       const isUpdating = itemData._id;
       const endpoint = isUpdating
-        ? `${import.meta.end.VITE_BACKEND_URL}/api/v1/item/updateItem/${itemData._id}`
-        : import.meta.end.VITE_BACKEND_URL + "/api/v1/item/addItem";
+        ? `${import.meta.env.VITE_BACKEND_URL}/api/v1/item/updateItem/${itemData._id}`
+        : import.meta.env.VITE_BACKEND_URL + "/api/v1/item/addItem";
       const method = isUpdating ? "PATCH" : "POST";
 
       const response = await fetch(endpoint, {
@@ -163,7 +163,7 @@ export const InventoryProvider = ({ children }) => {
     setError(null);
     try {
       const response = await fetch(
-        `${import.meta.end.VITE_BACKEND_URL}/api/v1/item/delete/${itemId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/item/delete/${itemId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -191,7 +191,7 @@ export const InventoryProvider = ({ children }) => {
     setError(null);
     try {
       const response = await fetch(
-        import.meta.end.VITE_BACKEND_URL + "/api/v1/item/addCategory",
+        import.meta.env.VITE_BACKEND_URL + "/api/v1/item/addCategory",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
