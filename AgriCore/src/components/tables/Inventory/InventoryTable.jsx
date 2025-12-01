@@ -10,6 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ItemDialog from './ItemDialog';
+import CategoryDialog from './CategoryDialog';
 import { InventoryContext } from '../../../context/InventoryContext';
 
 export default function InventoryTable() {
@@ -18,9 +19,11 @@ export default function InventoryTable() {
         categories,
         handleSaveItem,
         handleDeleteItem,
+        handleAddCategory,
     } = useContext(InventoryContext);
 
     const [open, setOpen] = useState(false);
+    const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -81,6 +84,9 @@ export default function InventoryTable() {
                 <Button variant="contained" color="primary" onClick={() => handleClickOpen()}>
                     Add New Item
                 </Button>
+                <Button variant="contained" color="secondary" onClick={() => setIsCategoryDialogOpen(true)}>
+                    Add New Category
+                </Button>
             </Box>
             <Box sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
                 <IconButton onClick={() => setShowSearchField(!showSearchField)} color="primary">
@@ -134,6 +140,11 @@ export default function InventoryTable() {
                 onClose={handleClose}
                 onSave={handleSaveItem}
                 item={editingItem}
+            />
+            <CategoryDialog
+                open={isCategoryDialogOpen}
+                onClose={() => setIsCategoryDialogOpen(false)}
+                onSave={handleAddCategory}
             />
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>

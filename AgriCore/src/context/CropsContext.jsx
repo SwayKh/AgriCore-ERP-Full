@@ -20,9 +20,16 @@ export const CropsProvider = ({ children }) => {
         setError(null);
         try {
             const response = await fetch('http://localhost:8000/api/v1/crop/getCrops', { credentials: 'include' });
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to fetch crops');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch crops');
+                } else {
+                    // Instead of throwing the full HTML, throw a more user-friendly message.
+                    throw new Error(`Failed to fetch crops. Status: ${response.status}. Please check if the backend is running and the endpoint is correct.`);
+                }
             }
             const result = await response.json();
             if (result.success && Array.isArray(result.data)) {

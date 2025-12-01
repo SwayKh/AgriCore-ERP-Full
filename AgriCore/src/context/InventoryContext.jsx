@@ -36,43 +36,35 @@ export const InventoryProvider = ({ children }) => {
             // Fetch inventory and categories in parallel.
             const [inventoryResponse, categoriesResponse] = await Promise.all([
                 fetch('http://localhost:8000/api/v1/item/getItems', { credentials: 'include' }),
-                // fetch('/api/v1/categories') // Assumed endpoint
+                fetch('http://localhost:8000/api/v1/category/getCategory', { credentials: 'include' })
             ]);
-            console.log(inventoryResponse);
             
-
             if (!inventoryResponse.ok) {
                 const errorData = await inventoryResponse.json();
-            
-                
                 throw new Error(errorData.message || 'Failed to fetch inventory');
             }
-            // if (!categoriesResponse.ok) {
-            //     const errorData = await categoriesResponse.json();
-            //     throw new Error(errorData.message || 'Failed to fetch categories');
-            // }
+            if (!categoriesResponse.ok) {
+                const errorData = await categoriesResponse.json();
+                throw new Error(errorData.message || 'Failed to fetch categories');
+            }
 
             const inventoryResult = await inventoryResponse.json();
-            //const categoriesResult = await categoriesResponse.json();
+            const categoriesResult = await categoriesResponse.json();
             
             // The server response for inventory is { success: true, data: [...] }
             if (inventoryResult.success && Array.isArray(inventoryResult.data)) {
                 setInventory(inventoryResult.data);
-                console.log(inventoryResult);
-                
             } else {
                 throw new Error('Unexpected response structure for inventory data');
             }
             
             // Assuming the server response for categories is { success: true, data: [...] }
-            // if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
-            //     setCategories(categoriesResult.data);
-            // } else {
-            //     // If the categories endpoint fails or is structured differently, we can still proceed
-            //     // but the UI might not display category names or units correctly.
-            //     console.warn('Could not fetch or parse categories.');
-            //     setCategories([]); // Set to empty array to prevent crashes
-            // }
+            if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
+                setCategories(categoriesResult.data);
+            } else {
+                console.warn('Could not fetch or parse categories.');
+                setCategories([]); // Set to empty array to prevent crashes
+            }
 
         } catch (err) {
             setError(err.message);
@@ -197,6 +189,37 @@ export const InventoryProvider = ({ children }) => {
             setLoading(false);
         }
     };
+
+    const handleAddCategory = async (categoryData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/category/addCategory', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoryData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add category');
+            }
+            
+            const result = await response.json();
+
+            if (result.success && result.data && result.data.newCategory) {
+                setCategories(prevCategories => [...prevCategories, result.data.newCategory]);
+            } else {
+                throw new Error('Unexpected response structure for adding category');
+            }
+
+        } catch (err) {
+            setError(err.message);
+            console.error("Failed to add category", err);
+        } finally {
+            setLoading(false);
+        }
+    };
     
     /**
      * Updates the quantity of a specific item in the backend.
@@ -236,6 +259,7 @@ export const InventoryProvider = ({ children }) => {
         fetchInventory: fetchData, // Exposing fetchData for manual refresh.
         handleSaveItem,
         handleDeleteItem,
+        handleAddCategory,
         updateInventoryQuantity,
     };
 

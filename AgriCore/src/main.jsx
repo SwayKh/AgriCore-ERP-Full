@@ -20,7 +20,6 @@ import InventoryTable from "./components/tables/Inventory/InventoryTable.jsx";
 import CropsTable from './components/tables/Crops/CropsTable.jsx';
 import LivestockTable from './components/tables/Livestock/LivestockTable.jsx';
 import FinanceTable from './components/tables/Finance/FinanceTable.jsx';
-import Dashboard from './components/Dashboard.jsx'; // Import the new Dashboard component
 
 import { InventoryProvider } from './context/InventoryContext.jsx';
 import { CropsProvider } from './context/CropsContext.jsx';
@@ -44,7 +43,7 @@ const router=createBrowserRouter([
         children:[
             {
                 index: true, // This route renders when the parent path (/) is matched exactly
-                element: <Dashboard/>
+                element: <InventoryTable/>
             },
             {
                 path:"inventory",
@@ -83,11 +82,10 @@ createRoot(document.getElementById('root')).render(
      <ThemeProvider theme={theme}>
         <CssBaseline/>
         <InventoryProvider>
-          <CropsProvider> {/* Ensure CropsProvider wraps RouterProvider */}
+          <CropsProvider>
             <RouterProvider router={router}/>
           </CropsProvider>
         </InventoryProvider>
      </ThemeProvider>
   </StrictMode>,
 );
-
