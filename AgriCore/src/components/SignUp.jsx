@@ -129,7 +129,7 @@ export default function SignUp(props) {
                 console.log('Sign-up successful:', data);
                 if (data.bearer) {
                     localStorage.setItem('bearer', data.bearer); // Save the token
-                    navigate('/'); // Redirect to the dashboard
+                    navigate('/app'); // Redirect to the dashboard
                 } else {
                     throw new Error('No bearer token received in response.');
                 }
