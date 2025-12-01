@@ -13,8 +13,8 @@ const categorySchema = new mongoose.Schema({
     unit:{
         type: String,
         enum: {
-        values: ["kg", "g", "liters", "ml", "pieces", "bags", "units", "tons"],
-        message: "Unit must be one of: kg, g, liters, ml, pieces, bags, units, tons",
+        values: ["kg", "g", "liters", "ml", "pieces", "bags", "units", "ton"],
+        message: "Unit must be one of: kg, g, liters, ml, pieces, bags, units, ton",
         },
         required:[true, "Unit is required!"],
     },
