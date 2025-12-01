@@ -66,8 +66,10 @@ export default function SignUp(props) {
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-    const [nameError, setNameError] = React.useState(false);
-    const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+    const [fullNameError, setFullNameError] = React.useState(false);
+    const [fullNameErrorMessage, setFullNameErrorMessage] = React.useState('');
+    const [usernameError, setUsernameError] = React.useState(false);
+    const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -75,15 +77,18 @@ export default function SignUp(props) {
         const form = event.currentTarget;
         const email = form.email.value;
         const password = form.password.value;
-        const username = form.name.value;
+        const fullName = form.fullName.value;
+        const username = form.username.value;
 
         // Reset all error states
         setEmailError(false);
         setEmailErrorMessage('');
         setPasswordError(false);
         setPasswordErrorMessage('');
-        setNameError(false);
-        setNameErrorMessage('');
+        setFullNameError(false);
+        setFullNameErrorMessage('');
+        setUsernameError(false);
+        setUsernameErrorMessage('');
 
         let isValid = true;
 
@@ -101,15 +106,22 @@ export default function SignUp(props) {
             isValid = false;
         }
 
-        // Validate name
+        // Validate fullName
+        if (!fullName || fullName.length < 1) {
+            setFullNameError(true);
+            setFullNameErrorMessage('Full name is required.');
+            isValid = false;
+        }
+        
+        // Validate username
         if (!username || username.length < 1) {
-            setNameError(true);
-            setNameErrorMessage('Name is required.');
+            setUsernameError(true);
+            setUsernameErrorMessage('Username is required.');
             isValid = false;
         }
 
         if (isValid) {
-            const data = { username, email, password };
+            const data = { fullName, username, email, password };
 
             fetch('http://localhost:8000/api/v1/user/register', { 
                 method: 'POST',
@@ -119,20 +131,18 @@ export default function SignUp(props) {
                 body: JSON.stringify(data),
             })
             .then(async (response) => {
-                if (response.ok) { // Check if the response was successful (status 200-299)
-                    return response.json();
+                if (!response.ok) { // Check if the response was successful (status 200-299)
+                    const errorData = await response.json().catch(() => ({message : "An error occurred"}));
+                    throw new Error(errorData.message || 'Sign-up failed');
                 }
-                const errorData = await response.json().catch(() => ({message : "An error occurred"}));
-                throw new Error(errorData.message || 'Sign-up failed');
+                return response.json();
             })
             .then(data => {
                 console.log('Sign-up successful:', data);
                 if (data.bearer) {
                     localStorage.setItem('bearer', data.bearer); // Save the token
-                    navigate('/app'); // Redirect to the dashboard
-                } else {
-                    throw new Error('No bearer token received in response.');
                 }
+                navigate('/app'); // Redirect to the dashboard
             })
             .catch(error => {
                 console.error('Sign-up error:', error.message);
@@ -161,17 +171,31 @@ export default function SignUp(props) {
                         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="name">Full name</FormLabel>
+                            <FormLabel htmlFor="fullName">Full name</FormLabel>
                             <TextField
                                 autoComplete="name"
-                                name="name"
+                                name="fullName"
                                 required
                                 fullWidth
-                                id="name"
+                                id="fullName"
                                 placeholder="Jon Snow"
-                                error={nameError}
-                                helperText={nameErrorMessage}
-                                color={nameError ? 'error' : 'primary'}
+                                error={fullNameError}
+                                helperText={fullNameErrorMessage}
+                                color={fullNameError ? 'error' : 'primary'}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="username">Username</FormLabel>
+                            <TextField
+                                autoComplete="username"
+                                name="username"
+                                required
+                                fullWidth
+                                id="username"
+                                placeholder="jon.snow"
+                                error={usernameError}
+                                helperText={usernameErrorMessage}
+                                color={usernameError ? 'error' : 'primary'}
                             />
                         </FormControl>
                         <FormControl>
