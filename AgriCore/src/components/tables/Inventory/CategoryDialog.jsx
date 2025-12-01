@@ -1,25 +1,45 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle
+    Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Alert
 } from '@mui/material';
 
-export default function CategoryDialog({ open, onClose, onSave }) {
+export default function CategoryDialog({ open, onClose, onSave, categoryError }) {
     const [newCategory, setNewCategory] = useState({ categoryName: '', unit: '' });
+    const [localError, setLocalError] = useState(null);
+
+    useEffect(() => {
+        if (open) {
+            setNewCategory({ categoryName: '', unit: '' });
+            setLocalError(null); // Clear local error when dialog opens
+        }
+    }, [open]);
 
     const handleNewCategoryChange = (e) => {
         setNewCategory({ ...newCategory, [e.target.name]: e.target.value });
     };
 
-    const handleSave = () => {
-        onSave(newCategory);
-        onClose(); // Close the dialog after saving
+    const handleSave = async () => {
+        setLocalError(null); // Clear previous errors before attempting save
+        if (!newCategory.categoryName || !newCategory.unit) {
+            setLocalError("Category Name and Unit are required.");
+            return;
+        }
+        const success = await onSave(newCategory);
+        if (success) {
+            onClose(); // Close the dialog only if saving was successful
+        } else {
+            // Error message will be set by the context and passed down via categoryError
+            // or if there is a local validation error
+        }
     };
 
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Add New Category</DialogTitle>
             <DialogContent>
+                {localError && <Alert severity="error" sx={{ mb: 2 }}>{localError}</Alert>}
+                {categoryError && <Alert severity="error" sx={{ mb: 2 }}>{categoryError}</Alert>}
                 <TextField
                     autoFocus
                     margin="dense"
@@ -30,6 +50,8 @@ export default function CategoryDialog({ open, onClose, onSave }) {
                     variant="standard"
                     value={newCategory.categoryName}
                     onChange={handleNewCategoryChange}
+                    error={!!localError && !newCategory.categoryName}
+                    helperText={!!localError && !newCategory.categoryName ? "Category Name is required" : ""}
                 />
                 <TextField
                     margin="dense"
@@ -40,6 +62,8 @@ export default function CategoryDialog({ open, onClose, onSave }) {
                     variant="standard"
                     value={newCategory.unit}
                     onChange={handleNewCategoryChange}
+                    error={!!localError && !newCategory.unit}
+                    helperText={!!localError && !newCategory.unit ? "Unit is required" : ""}
                 />
             </DialogContent>
             <DialogActions>

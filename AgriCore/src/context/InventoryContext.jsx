@@ -36,7 +36,7 @@ export const InventoryProvider = ({ children }) => {
             // Fetch inventory and categories in parallel.
             const [inventoryResponse, categoriesResponse] = await Promise.all([
                 fetch('http://localhost:8000/api/v1/item/getItems', { credentials: 'include' }),
-                fetch('http://localhost:8000/api/v1/category/getCategory', { credentials: 'include' })
+                fetch('http://localhost:8000/api/v1/item/getCategories', { credentials: 'include' })
             ]);
             
             if (!inventoryResponse.ok) {
@@ -61,6 +61,10 @@ export const InventoryProvider = ({ children }) => {
             // Assuming the server response for categories is { success: true, data: [...] }
             if (categoriesResult.success && Array.isArray(categoriesResult.data)) {
                 setCategories(categoriesResult.data);
+                // console.log(categoriesResult.data);
+                
+                
+               
             } else {
                 console.warn('Could not fetch or parse categories.');
                 setCategories([]); // Set to empty array to prevent crashes
@@ -112,14 +116,17 @@ export const InventoryProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
+            console.log(itemData);
+            
             const isUpdating = itemData._id;
-            const endpoint = isUpdating ? `http://localhost:8000/api/v1/item/updateItem/${itemData._id}` : 'http://localhost:8000/api/v1/item/createItem';
+            const endpoint = isUpdating ? `http://localhost:8000/api/v1/item/updateItem/${itemData._id}` : 'http://localhost:8000/api/v1/item/addItem';
             const method = isUpdating ? 'PATCH' : 'POST';
 
             const response = await fetch(endpoint, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(itemData),
+                credentials:'include'
             });
 
             if (!response.ok) {
@@ -140,9 +147,11 @@ export const InventoryProvider = ({ children }) => {
                         stockId: itemStock._id // Ensure stockId is present
                     };
                     setInventory(prevInventory => [...prevInventory, newItemForState]);
+                    return true;
                 } else {
                     // Fallback to full fetch if response structure is unexpected
                     await fetchData();
+                    return true; // Assume success if refetched
                 }
             } else {
                 // For updates, assuming the backend returns the updated item,
@@ -151,16 +160,18 @@ export const InventoryProvider = ({ children }) => {
                     setInventory(prevInventory =>
                         prevInventory.map(item => (item._id === result.data._id ? result.data : item))
                     );
+                    return true;
                 } else {
                     // Fallback to full fetch if specific updated item is not returned
                     await fetchData();
+                    return true; // Assume success if refetched
                 }
             }
 
         } catch (err) {
             setError(err.message);
             console.error("Failed to save item", err);
-            await fetchData(); // Ensure state is consistent after an error
+            return false; // Indicate failure
         } finally {
             setLoading(false);
         }
@@ -194,10 +205,11 @@ export const InventoryProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:8000/api/v1/category/addCategory', {
+            const response = await fetch('http://localhost:8000/api/v1/item/addCategory', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(categoryData),
+                credentials:'include'
             });
 
             if (!response.ok) {
@@ -209,13 +221,15 @@ export const InventoryProvider = ({ children }) => {
 
             if (result.success && result.data && result.data.newCategory) {
                 setCategories(prevCategories => [...prevCategories, result.data.newCategory]);
+                return true; // Indicate success
             } else {
-                throw new Error('Unexpected response structure for adding category');
+                throw new Error(result.message || 'Unexpected response structure for adding category');
             }
 
         } catch (err) {
             setError(err.message);
             console.error("Failed to add category", err);
+            return false; // Indicate failure
         } finally {
             setLoading(false);
         }
@@ -230,10 +244,11 @@ export const InventoryProvider = ({ children }) => {
         setError(null);
         try {
             // This endpoint might need to be adjusted based on your actual API design.
-            const response = await fetch(`/api/v1/inventory/${itemId}/quantity`, {
+            const response = await fetch(`/api/v1/item/updateItem/${itemId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ quantityChange }),
+                credentials:'include',
             });
 
             if (!response.ok) {

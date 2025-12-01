@@ -20,6 +20,7 @@ export default function InventoryTable() {
         handleSaveItem,
         handleDeleteItem,
         handleAddCategory,
+        error // Get the error state from context
     } = useContext(InventoryContext);
 
     const [open, setOpen] = useState(false);
@@ -68,6 +69,7 @@ export default function InventoryTable() {
         item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (selectedCategories.length === 0 || selectedCategories.includes(item.category))
     );
+
 
     const groupedInventory = filteredInventory.reduce((acc, item) => {
         const categoryId = item.category || 'Uncategorized';
@@ -123,13 +125,13 @@ export default function InventoryTable() {
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((value) => (
-                                        <Chip key={value} label={categoryMap.get(value)?.name || value} />
+                                        <Chip key={value} label={categoryMap.get(value)?.categoryName || value} />
                                     ))}
                                 </Box>
                             )}
                         >
                             {categories.map(cat => (
-                                <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
+                                <MenuItem key={cat._id} value={cat._id}>{cat.categoryName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
@@ -140,11 +142,13 @@ export default function InventoryTable() {
                 onClose={handleClose}
                 onSave={handleSaveItem}
                 item={editingItem}
+                itemError={error} // Pass the error state
             />
             <CategoryDialog
                 open={isCategoryDialogOpen}
                 onClose={() => setIsCategoryDialogOpen(false)}
                 onSave={handleAddCategory}
+                categoryError={error} // Pass the error state
             />
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
@@ -160,7 +164,7 @@ export default function InventoryTable() {
                         <React.Fragment key={categoryId}>
                             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
                                 <TableCell colSpan={4} sx={{ fontWeight: 'bold' }}>
-                                    <Typography variant="h6">{categoryMap.get(categoryId)?.name || 'Uncategorized'}</Typography>
+                                    <Typography variant="h6">{categoryMap.get(categoryId)?.categoryName || 'Uncategorized'}</Typography>
                                 </TableCell>
                             </TableRow>
                             {groupedInventory[categoryId].map((item) => (
@@ -187,4 +191,3 @@ export default function InventoryTable() {
         </TableContainer>
     );
 }
-
