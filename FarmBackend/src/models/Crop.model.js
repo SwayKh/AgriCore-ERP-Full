@@ -53,13 +53,6 @@ const cropSchema = new mongoose.Schema(
         message: "Harvested date cannot be before planting date",
       },
     },
-
-    actualYield: {
-      type: Number,
-      default: null,
-      min: [0, "Yield cannot be negative"],
-    },
-
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
