@@ -14,9 +14,6 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-// import AppTheme from '../shared-theme/AppTheme';
-// import ColorModeSelect from '../shared-theme/ColorModeSelect';
-// import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -66,10 +63,13 @@ export default function SignUp(props) {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = React.useState(false); // New state
+  const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState(""); // New state
   const [fullNameError, setFullNameError] = React.useState(false);
   const [fullNameErrorMessage, setFullNameErrorMessage] = React.useState("");
   const [usernameError, setUsernameError] = React.useState(false);
   const [usernameErrorMessage, setUsernameErrorMessage] = React.useState("");
+  const [apiError, setApiError] = React.useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -77,6 +77,7 @@ export default function SignUp(props) {
     const form = event.currentTarget;
     const email = form.email.value;
     const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value; // New field
     const fullName = form.fullName.value;
     const username = form.username.value;
 
@@ -85,10 +86,13 @@ export default function SignUp(props) {
     setEmailErrorMessage("");
     setPasswordError(false);
     setPasswordErrorMessage("");
+    setConfirmPasswordError(false); // Reset
+    setConfirmPasswordErrorMessage(""); // Reset
     setFullNameError(false);
     setFullNameErrorMessage("");
     setUsernameError(false);
     setUsernameErrorMessage("");
+    setApiError("");
 
     let isValid = true;
 
@@ -104,19 +108,25 @@ export default function SignUp(props) {
       setPasswordError(true);
       setPasswordErrorMessage("Password must be at least 6 characters long.");
       isValid = false;
+    } else if (password !== confirmPassword) { // New validation
+      setPasswordError(true);
+      setPasswordErrorMessage("Passwords do not match.");
+      setConfirmPasswordError(true);
+      setConfirmPasswordErrorMessage("Passwords do not match.");
+      isValid = false;
     }
 
     // Validate fullName
-    if (!fullName || fullName.length < 1) {
+    if (!fullName || fullName.length < 2) { // Changed from 1 to 2
       setFullNameError(true);
-      setFullNameErrorMessage("Full name is required.");
+      setFullNameErrorMessage("Full name is required and must be at least 2 characters long.");
       isValid = false;
     }
 
     // Validate username
-    if (!username || username.length < 1) {
+    if (!username || username.length < 2) { // Changed from 1 to 2
       setUsernameError(true);
-      setUsernameErrorMessage("Username is required.");
+      setUsernameErrorMessage("Username is required and must be at least 2 characters long.");
       isValid = false;
     }
 
@@ -132,7 +142,6 @@ export default function SignUp(props) {
       })
         .then(async (response) => {
           if (!response.ok) {
-            // Check if the response was successful (status 200-299)
             const errorData = await response
               .json()
               .catch(() => ({ message: "An error occurred" }));
@@ -142,24 +151,18 @@ export default function SignUp(props) {
         })
         .then((data) => {
           console.log("Sign-up successful:", data);
-          if (data.bearer) {
-            localStorage.setItem("bearer", data.bearer); // Save the token
-          }
-          navigate("/app"); // Redirect to the dashboard
+          navigate("/login");
         })
         .catch((error) => {
           console.error("Sign-up error:", error.message);
+          setApiError(error.message);
         });
     }
   };
 
   return (
-    // <AppTheme {...props}>
-    //     <CssBaseline enableColorScheme />
-    // <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
     <SignUpContainer direction="column" justifyContent="space-between">
       <Card variant="outlined">
-        {/*<SitemarkIcon />*/}
         <Typography
           component="h1"
           variant="h4"
@@ -212,7 +215,7 @@ export default function SignUp(props) {
               variant="outlined"
               error={emailError}
               helperText={emailErrorMessage}
-              color={passwordError ? "error" : "primary"}
+              color={emailError ? "error" : "primary"} // Corrected color prop
             />
           </FormControl>
           <FormControl>
@@ -231,10 +234,27 @@ export default function SignUp(props) {
               color={passwordError ? "error" : "primary"}
             />
           </FormControl>
+          <FormControl> {/* New field for confirm password */}
+            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+            <TextField
+              required
+              fullWidth
+              name="confirmPassword"
+              placeholder="••••••"
+              type="password"
+              id="confirmPassword"
+              autoComplete="new-password"
+              variant="outlined"
+              error={confirmPasswordError}
+              helperText={confirmPasswordErrorMessage}
+              color={confirmPasswordError ? "error" : "primary"}
+            />
+          </FormControl>
           <FormControlLabel
             control={<Checkbox value="allowExtraEmails" color="primary" />}
             label="I want to receive updates via email."
           />
+          {apiError && <Typography color="error">{apiError}</Typography>}
           <Button type="submit" fullWidth variant="contained">
             Sign up
           </Button>
@@ -247,7 +267,6 @@ export default function SignUp(props) {
             fullWidth
             variant="outlined"
             onClick={() => alert("Sign up with Google")}
-            // startIcon={<GoogleIcon />}
           >
             Sign up with Google
           </Button>
@@ -255,14 +274,12 @@ export default function SignUp(props) {
             fullWidth
             variant="outlined"
             onClick={() => alert("Sign up with Facebook")}
-            // startIcon={<FacebookIcon />}
           >
             Sign up with Facebook
           </Button>
           <Typography sx={{ textAlign: "center" }}>
             Already have an account?{" "}
             <Link
-              // href="/material-ui/getting-started/templates/sign-in/"
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
@@ -272,6 +289,5 @@ export default function SignUp(props) {
         </Box>
       </Card>
     </SignUpContainer>
-    // </AppTheme>
   );
 }

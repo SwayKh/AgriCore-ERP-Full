@@ -15,11 +15,10 @@ import {createTheme} from "@mui/material/styles"
 import { green, amber } from "@mui/material/colors";
 import LandingPage from './components/LandingPage.jsx';
 
-import ProtectedRoutes from "./Utils/ProtectedRoutes.jsx";
 import InventoryTable from "./components/tables/Inventory/InventoryTable.jsx";
 import CropsTable from './components/tables/Crops/CropsTable.jsx';
 import LivestockTable from './components/tables/Livestock/LivestockTable.jsx';
-import FinanceTable from './components/tables/Finance/FinanceTable.jsx';
+import FinanceTable from "./components/tables/Finance/FinanceTable.jsx";
 
 import { InventoryProvider } from './context/InventoryContext.jsx';
 import { CropsProvider } from './context/CropsContext.jsx';
@@ -39,7 +38,7 @@ const router=createBrowserRouter([
     },
     {
         path:'/app',
-        element:<ProtectedRoutes><Layout/></ProtectedRoutes>, // Protect the entire layout
+        element:<Layout/>, // Now directly renders Layout, protection handled by backend
         children:[
             {
                 index: true, // This route renders when the parent path (/) is matched exactly

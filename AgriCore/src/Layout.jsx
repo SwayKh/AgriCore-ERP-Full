@@ -10,7 +10,6 @@ const drawerWidth = 240;
 
 function Layout() {
     const location = useLocation();
-    const { username } = location.state || {};
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleSidebarToggle = () => {
@@ -20,7 +19,7 @@ function Layout() {
     return (
         <Box sx={{ display: 'flex' }}>
             <Nav handleSidebarToggle={handleSidebarToggle} />
-            <Sidebar username={username} sidebarOpen={sidebarOpen} handleSidebarToggle={handleSidebarToggle} />
+            <Sidebar sidebarOpen={sidebarOpen} handleSidebarToggle={handleSidebarToggle} />
             <Box
                 component="main"
                 sx={{ flexGrow: 1, p: 3, ml: sidebarOpen ? `${drawerWidth}px` : '0px', transition: 'margin-left 0.3s' }}

@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -8,18 +8,20 @@ import {
   TextField,
   Typography,
   FormLabel,
+  CircularProgress, // Import CircularProgress for loading indicator
 } from "@mui/material";
-import { useState } from "react";
 
 function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // Set loading to true on submission
 
     try {
       const response = await fetch(
@@ -37,7 +39,6 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         console.log("Login successful:", data);
-        // Assuming the API returns a user object with a username field
         navigate("/app", { state: { username: data.data.username } });
       } else {
         const errorData = await response
@@ -48,6 +49,8 @@ function Login() {
     } catch (error) {
       console.error("Login error:", error.message);
       setError(error.message);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
 
@@ -104,8 +107,8 @@ function Login() {
               }}
             />
             {error && <Typography color="error">{error}</Typography>}
-            <Button sx={{ border: 1 }} type="submit">
-              Submit
+            <Button sx={{ border: 1 }} type="submit" disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : "Submit"}
             </Button>
           </Box>
         </Stack>
